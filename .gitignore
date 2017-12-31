@@ -1,0 +1,9 @@
+Release/
+Debug/
+x64/
+*.filters
+*.user
+.vs/
+ChickenKIR/Release/
+ChickenKIR/Debug/
+ChickenKIR/x64/
