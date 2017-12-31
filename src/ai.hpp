@@ -21,7 +21,7 @@ private:
 	void expand(Game<row, col>& board)
 	{	
 		//扩展出所有子节点
-		std::vector<int> indices = board.getNearPositions(3);
+		std::vector<int> indices = board.getNearPositions(2);
 		for (auto i: indices)
 		{
 			children.push_back(std::make_pair(nullptr, i));

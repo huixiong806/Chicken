@@ -132,7 +132,7 @@ public:
 		else
 		{
 			// Random play
-			std::vector<int> pool = getNearPositions(3);
+			std::vector<int> pool = getNearPositions(2);
 			index = pool[rand() % pool.size()];
 		}
 		play(index, color);
