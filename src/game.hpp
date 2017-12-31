@@ -216,7 +216,7 @@ public:
 			{
 				if (board[i][j] == Stone::EMPTY)
 				{
-					std::cout << "  ";
+					std::cout << " .";
 				}
 				else if (board[i][j] == Stone::BLACK)
 				{

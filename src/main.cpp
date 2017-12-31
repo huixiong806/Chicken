@@ -13,6 +13,13 @@ using namespace std;
 const int siz = 15;
 int main()
 {
+	bool outputStone = true;
+	ifstream config("config.ini");
+	if (config.is_open())
+	{
+		config >> outputStone;
+		config.close();
+	}
 	cout << "Chicken K_in_A_Line test ver 1" << endl;
 	cout << "Input your color(1=Black,-1=White,0=two computer):" << endl;
 	int32_t myColor;
@@ -30,7 +37,7 @@ int main()
 	*/
 	srand(time(0));
 	Game<siz, siz>game(5);
-	game.outputStone();
+	if (outputStone) game.outputStone(); else game.output();
 	MonteCarloTreeSearchAI<siz, siz> ai;
 	int32_t color = 1;
 	int32_t winner = 0;
@@ -53,11 +60,9 @@ int main()
 			winner = -color;
 			break;
 		}
-		if (index == siz * siz + 2)
-			game.fastPlay((Stone)color); // For debugging
-		else
-			game.play(index, (Stone)color);
-		game.outputStone();
+		if (index == siz * siz + 2) game.fastPlay((Stone)color); // For debugging
+		else game.play(index, (Stone)color);
+		if (outputStone) game.outputStone(); else game.output();
 		cout << endl;
 		color = -color;
 	}
