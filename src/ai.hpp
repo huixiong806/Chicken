@@ -4,7 +4,6 @@
 #include<vector>
 #include<string>
 #include<math.h>
-#include<Windows.h>
 const double selectConst = 0.3;
 /*
  double timecount;
@@ -20,17 +19,14 @@ private:
 		return children.empty();
 	}
 	void expand(Game<row, col>& board)
-	{
-		
+	{	
 		//扩展出所有子节点
-		for (int i = 0; i <= row*col; ++i)
-		{	
-			if (board.canPlay(i))
-			{
-				children.push_back(std::make_pair(nullptr, i));
-				children.rbegin()->first = new TreeNode();
-				children.rbegin()->first->color = (Color)-(int32_t)color;
-			}
+		std::vector<int> indices = board.getNearPositions(2);
+		for (auto i: indices)
+		{
+			children.push_back(std::make_pair(nullptr, i));
+			children.rbegin()->first = new TreeNode();
+			children.rbegin()->first->color = (Color)-(int32_t)color;
 		}
 	}
 	std::pair<TreeNode*, int32_t> select()
@@ -62,7 +58,7 @@ private:
 		int32_t curColor = (int32_t)color;
 		while(!temp.gameOver())
 		{
-			temp.randomPlay((Color)curColor);
+			temp.fastPlay((Color)curColor);
 			//temp.output();
 			curColor = -curColor;
 		}

@@ -13,7 +13,7 @@ using namespace std;
 const int siz = 10;
 int main()
 {
-	cout << "Chicken K_in_A_Row test ver 1" << endl;
+	cout << "Chicken K_in_A_Line test ver 1" << endl;
 	cout << "Input your color(1=Black,-1=White,0=two computer):" << endl;
 	int32_t myColor;
 	cin >> myColor;
@@ -47,13 +47,16 @@ int main()
 			index = p * siz + q;
 		}
 		else index=ai.genMove(game,(Color)color,playout);
-		if (index == siz *siz +1)
+		if (index == siz * siz + 1)
 		{
 			cout << (color > 0 ? "Black" : "White") << " resigned." << endl;
 			winner = -color;
 			break;
 		}
-		game.play(index, (Stone)color);
+		if (index == siz * siz + 2)
+			game.fastPlay((Stone)color); // For debugging
+		else
+			game.play(index, (Stone)color);
 		game.output();
 		cout << endl;
 		color = -color;
