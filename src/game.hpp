@@ -90,9 +90,11 @@ public:
 
 		return res;
 	}
-	bool explicitPlay(Color color)
+	// Returns (index, -1) for a k-1 row.
+	// Returns (index1, index2) for a k-2 row.
+	// Returns (-1,-1) for nothing.
+	std::pair<int,int> getCriticalPoint(Color color)
 	{
-		Color opposite = color == Stone::BLACK ? Stone::WHITE : Stone::BLACK;
 		const int rd[4] = { 1,0,1,1 };
 		const int cd[4] = { 0,1,1,-1 };
 		for (int i = 0; i < row; i++)
@@ -100,46 +102,40 @@ public:
 				for (int k = 0; k < 4; k++)
 				{
 					int ir = i - rd[k], ic = j - cd[k];
-					if (inside(ir, ic) && board.getGirdC(ir, ic) == opposite) continue;
+					if (inside(ir, ic) && board.getGirdC(ir, ic) == color) continue;
 					int r = i, c = j, cnt = 0;
-					while (cnt < winK && inside(r, c) && board.getGirdC(r, c) == opposite)
+					while (cnt < winK && inside(r, c) && board.getGirdC(r, c) == color)
 						r += rd[k], c += cd[k], cnt++;
 					if (cnt == winK - 1)
 					{
 						if (canPlay(r, c))
-						{
-							play(r*col + c, color);
-							return true;
-						}
+							return std::make_pair(r*col + c, -1);
 						else if (canPlay(ir, ic))
-						{
-							play(ir*col + ic, color);
-							return true;
-						}
+							return std::make_pair(ir*col + ic, -1);
 						continue;
 					}
 					if (cnt == winK - 2 && canPlay(r, c) && canPlay(ir, ic))
-					{
-						if (rand() % 2 == 1)
-						{
-							play(r*col + c, color);
-							return true;
-						}
-						else
-						{
-							play(ir*col + ic, color);
-							return true;
-						}
-					}
+						return std::make_pair(r*col + c, ir*col + ic);
 				}
-		return false;
+		return std::make_pair(-1, -1);
 	}
 	void fastPlay(Color color)
 	{
-		if (explicitPlay(color))
-			return;
-		std::vector<int> pool = getNearPositions(2);
-		play(pool[rand() % pool.size()], color);
+		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
+		std::pair<int, int> c = getCriticalPoint(color), oc = getCriticalPoint(opposite);
+		int index;
+		// Fast decisions
+		if (c.first != -1 && c.second == -1)
+			index = c.first;
+		else if (oc.first != -1 && oc.second == -1)
+			index = oc.first;
+		else
+		{
+			// Random play
+			std::vector<int> pool = getNearPositions(2);
+			index = pool[rand() % pool.size()];
+		}
+		play(index, color);
 	}
 	bool gameOver()
 	{
