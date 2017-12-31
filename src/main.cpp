@@ -10,7 +10,7 @@ Publish under GNU General Public License v3.0 Licence.
 #include<algorithm>
 #include<thread>
 using namespace std;
-const int siz = 10;
+const int siz = 15;
 int main()
 {
 	cout << "Chicken K_in_A_Line test ver 1" << endl;
@@ -30,7 +30,7 @@ int main()
 	*/
 	srand(time(0));
 	Game<siz, siz>game(5);
-	game.output();
+	game.outputStone();
 	MonteCarloTreeSearchAI<siz, siz> ai;
 	int32_t color = 1;
 	int32_t winner = 0;
@@ -57,7 +57,7 @@ int main()
 			game.fastPlay((Stone)color); // For debugging
 		else
 			game.play(index, (Stone)color);
-		game.output();
+		game.outputStone();
 		cout << endl;
 		color = -color;
 	}

@@ -132,7 +132,7 @@ public:
 		else
 		{
 			// Random play
-			std::vector<int> pool = getNearPositions(2);
+			std::vector<int> pool = getNearPositions(3);
 			index = pool[rand() % pool.size()];
 		}
 		play(index, color);
@@ -235,6 +235,62 @@ public:
 			std::cout << " " << (char)(j + 'A');
 		}
 		std::cout << std::endl;
+	}
+	void outputStone()
+	{
+		std::cout << " ";
+		for (int j = 0; j < col; ++j)
+		{
+			std::cout << " " << (char)(j + 'A');
+		}
+		std::cout << endl;
+		for (int i = 0; i < row; ++i)
+		{
+			if ((row - i) < 10)
+				std::cout << " " << (row - i);
+			else std::cout << (row - i);
+			for (int j = 0; j < col; ++j)
+			{
+				if (board[i][j] == Stone::EMPTY)
+				{
+					//std::cout << " .";
+					if (i == 0 && j == 0)
+						std::cout << "©³";
+					else if (i == row - 1 && j == 0)
+						std::cout << "©»";
+					else if (i == 0 && j == col - 1)
+						std::cout << "©·";
+					else if (i == row - 1 && j == col - 1)
+						std::cout << "©¿";
+					else if (i == 0)
+						std::cout << "©Ó";
+					else if (i == row - 1)
+						std::cout << "©Û";
+					else if (j == 0)
+						std::cout << "©Ä";
+					else if (j == col - 1)
+						std::cout << "©Ì";
+					else std::cout << "©à";
+				}
+				else if (board[i][j] == Stone::BLACK)
+				{
+					//std::cout << "¡ñ";
+					std::cout << "¡ð";
+				}
+				//std::cout << "¡ð";
+				else std::cout << "¡ñ";
+			}
+			if ((row - i) < 10)
+				std::cout << " " << (row - i);
+			else std::cout << (row - i);
+			std::cout << std::endl;
+		}
+		std::cout << " ";
+		for (int j = 0; j < col; ++j)
+		{
+			std::cout << " " << (char)(j + 'A');
+		}
+		std::cout << endl;
 	}
 };
 #endif
