@@ -138,7 +138,6 @@ public:
 		else
 		{
 			// Random play
-			//randomPlayRange = 2;
 			std::vector<int32_t> pool = getNearPositions(randomPlayRange);
 			index = pool[rand() % pool.size()];
 		}
