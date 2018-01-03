@@ -41,11 +41,13 @@ public:
 		blackPass = false;
 		whitePass = false;
 	}
+	/*
 	Game(const int32_t winK_) :winK(winK_)
 	{
 		blackPass = false;
 		whitePass = false;
 	}
+	*/
 	bool canPlay(size_t index)
 	{
 		if (index == row * col)return true;
@@ -141,6 +143,7 @@ public:
 		else
 		{
 			// Random play
+			//randomPlayRange = 2;
 			std::vector<int32_t> pool = getNearPositions(randomPlayRange);
 			index = pool[rand() % pool.size()];
 		}

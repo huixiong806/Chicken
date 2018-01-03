@@ -35,7 +35,7 @@ int main()
 	cout.rdbuf(fout.rdbuf());
 	*/
 	srand(time(0));
-	Game<siz, siz>game(5);
+	Game<siz, siz> game;
 	if (outputStone) game.outputStone(); else game.output();
 	MonteCarloTreeSearchAI<siz, siz> ai;
 	int32_t color = 1;
