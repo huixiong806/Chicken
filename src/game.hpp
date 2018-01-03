@@ -61,7 +61,7 @@ public:
 	}
 	std::vector<int> getNearPositions(int dist)
 	{
-		std::queue<pair<int, int> > q;
+		std::queue<size_t> q;
 		std::unique_ptr<int> dptr(new int[row*col]);
 		int* d = dptr.get();
 
@@ -70,24 +70,24 @@ public:
 			for (int j = 0; j < col; j++)
 				if (board.getGirdC(i, j) != Stone::EMPTY)
 				{
-					q.push(make_pair(i, j));
+					q.push(i*col+j);
 					d[i*col + j] = 0;
 				}
 
 		std::vector<int> res;
 
 		while (!q.empty()) {
-			pair<int, int> p = q.front(); q.pop();
-			int dd = d[p.first*col + p.second];
+			size_t p = q.front(); q.pop();
+			int dd = d[p];
 			if (dd >= dist) break;
 
-			if (dd > 0) res.push_back(p.first*col + p.second);
+			if (dd > 0) res.push_back(p);
 
 			const int rd[8] = { 1,0,-1,0,1,1,-1,-1 }, cd[8] = { 0,1,0,-1,1,-1,1,-1 };
 			for (int k = 0; k < 8; k++) {
-				int rr = p.first + rd[k], cc = p.second + cd[k];
+				int rr = p/col + rd[k], cc = p%col + cd[k];
 				if (inside(rr, cc) && d[rr*col + cc] == -1) {
-					q.push(make_pair(rr, cc));
+					q.push(rr*col+cc);
 					d[rr*col + cc] = dd + 1;
 				}
 			}
@@ -140,7 +140,7 @@ public:
 		else
 		{
 			// Random play
-			std::vector<int32_t> pool = getNearPositions(winK - 2);
+			std::vector<int32_t> pool = getNearPositions(winK - 3);
 			index = pool[rand() % pool.size()];
 		}
 		play(index, color);
