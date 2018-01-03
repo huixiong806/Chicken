@@ -22,7 +22,7 @@ private:
 	void expand(Game<row, col>& board)
 	{	
 		//扩展出所有子节点
-		std::vector<int> indices = board.getNearPositions(board.getWink()-2);
+		std::vector<int> indices = board.getNearPositions(board.getWink() / 2);
 		//indices.push_back(row*col);
 		for (auto i: indices)
 		{
@@ -142,7 +142,7 @@ public:
 		}	
 		QueryPerformanceCounter(&endTime);
 		runTime = (((endTime.QuadPart - startTime.QuadPart)*1.0) / cpuFreq.QuadPart);
-		std::cout<<"speed:"<< ((double)playout / (double)runTime) << "n/s" << std::endl;
+		std::cout<<"speed: "<< ((double)playout / (double)runTime) << "n/s" << std::endl;
 		int32_t maxTimes = -1;
 		size_t choice = 0;
 		double winRate=0;
@@ -157,7 +157,7 @@ public:
 		}
 		if (winRate < 0.1)return row*col + 1;//认输
 		sort(root->children.begin(), root->children.end(), cmp<row, col>);
-		std::cout << "result:" << std::endl;
+		std::cout << "result: " << std::endl;
 		for (int32_t i = 0; i<=5&&i < root->children.size(); ++i)
 		{
 			auto c = root->children[i].first;

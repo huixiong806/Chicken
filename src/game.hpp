@@ -26,7 +26,7 @@ class Game
 {
 private:
 	Board<row, col> board;
-	int32_t winK;
+	int32_t winK, randomPlayRange;
 	bool blackPass, whitePass;
 protected:
 public:
@@ -37,6 +37,7 @@ public:
 	Game()
 	{
 		winK = 5;
+		randomPlayRange = 2;
 		blackPass = false;
 		whitePass = false;
 	}
@@ -140,7 +141,7 @@ public:
 		else
 		{
 			// Random play
-			std::vector<int32_t> pool = getNearPositions(winK - 3);
+			std::vector<int32_t> pool = getNearPositions(randomPlayRange);
 			index = pool[rand() % pool.size()];
 		}
 		play(index, color);
