@@ -4,6 +4,7 @@
 #include<vector>
 #include<string>
 #include<math.h>
+#include<Windows.h>
 const double selectConst = 0.3;
 /*
  double timecount;
@@ -21,7 +22,8 @@ private:
 	void expand(Game<row, col>& board)
 	{	
 		//扩展出所有子节点
-		std::vector<int> indices = board.getNearPositions(3);
+		std::vector<int> indices = board.getNearPositions(board.getWink()-2);
+		//indices.push_back(row*col);
 		for (auto i: indices)
 		{
 			children.push_back(std::make_pair(nullptr, i));
@@ -125,31 +127,22 @@ public:
 	MonteCarloTreeSearchAI() {}
 	size_t genMove(const Game<row, col>& board, Color color,int32_t playout)
 	{
-		/*
 		LARGE_INTEGER cpuFreq;
 		LARGE_INTEGER startTime;
 		LARGE_INTEGER endTime;
-		timecount = 0;
-		*/
 		root = new TreeNode<row, col>();
 		root->color = color;
-		/*
 		double runTime = 0;
 		QueryPerformanceFrequency(&cpuFreq);
 		QueryPerformanceCounter(&startTime);
-		*/
-		while (playout--)
+		for(size_t t=1;t<=playout;++t)
 		{
-			//cout << "剩余playout:" << playout << endl;
 			myBoard = board;
 			root->selectAction(myBoard);
 		}	
-		/*
-		 QueryPerformanceCounter(&endTime);
-		 runTime = (((endTime.QuadPart - startTime.QuadPart) * 1000.0f) / cpuFreq.QuadPart);
-		 cout<<"time:"<< timecount << endl;
-		 cout << "total_time:"<<runTime << endl;
-		*/
+		QueryPerformanceCounter(&endTime);
+		runTime = (((endTime.QuadPart - startTime.QuadPart)*1.0) / cpuFreq.QuadPart);
+		std::cout<<"speed:"<< ((double)playout / (double)runTime) << "n/s" << std::endl;
 		int32_t maxTimes = -1;
 		size_t choice = 0;
 		double winRate=0;
@@ -164,6 +157,7 @@ public:
 		}
 		if (winRate < 0.1)return row*col + 1;//认输
 		sort(root->children.begin(), root->children.end(), cmp<row, col>);
+		std::cout << "result:" << std::endl;
 		for (int32_t i = 0; i<=5&&i < root->children.size(); ++i)
 		{
 			auto c = root->children[i].first;

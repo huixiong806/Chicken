@@ -12,6 +12,10 @@ Publish under GNU General Public License v3.0 Licence.
 #include <queue>
 #include <algorithm>
 #include "hash.hpp"
+const double value[2][4] =
+{ {0.3,0.5,3.0,10.0},
+  {0.2,0.4,2.0,20.0}
+};
 enum class PutStoneResult :bool
 {
 	NOTALLOWED,
@@ -26,6 +30,10 @@ private:
 	bool blackPass, whitePass;
 protected:
 public:
+	int32_t getWink()
+	{
+		return winK;
+	}
 	Game()
 	{
 		winK = 5;
@@ -121,9 +129,9 @@ public:
 	}
 	void fastPlay(Color color)
 	{
+		int index;
 		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
 		std::pair<int, int> c = getCriticalPoint(color), oc = getCriticalPoint(opposite);
-		int index;
 		// Fast decisions
 		if (c.first != -1 && c.second == -1)
 			index = c.first;
@@ -132,7 +140,7 @@ public:
 		else
 		{
 			// Random play
-			std::vector<int> pool = getNearPositions(3);
+			std::vector<int32_t> pool = getNearPositions(winK - 2);
 			index = pool[rand() % pool.size()];
 		}
 		play(index, color);

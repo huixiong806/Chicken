@@ -10,7 +10,7 @@ Publish under GNU General Public License v3.0 Licence.
 #include<algorithm>
 #include<thread>
 using namespace std;
-const int siz = 15;
+const int siz =15;
 int main()
 {
 	bool outputStone = true;
@@ -27,7 +27,6 @@ int main()
 	cout << "Input MCTS playout(>1000):" << endl;
 	int32_t playout;
 	cin >> playout;
-	ZobristHash<siz, siz>::reInit();
 	/*
 	streambuf * backup;
 	ofstream fout;
@@ -43,7 +42,7 @@ int main()
 	int32_t winner = 0;
 	while (!game.gameOver())
 	{
-		cout << (color > 0 ? "Black:" : "White:") << endl;
+		cout << (color > 0 ? "Black's turn" : "White's turn") << endl;
 		size_t index;
 		if (color == myColor)
 		{
