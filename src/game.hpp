@@ -48,9 +48,9 @@ public:
 		whitePass = false;
 	}
 	*/
-	bool canPlay(size_t index)
+	bool isEmpty(size_t index)
 	{
-		if (index == row * col)return true;
+		if (index == row * col) return true;
 		return board.getGirdC(index) == Stone::EMPTY;
 	}
 	bool inside(int r, int c)
@@ -60,7 +60,7 @@ public:
 	bool canPlay(int r, int c)
 	{
 		if (!inside(r, c)) return false;
-		return canPlay(r*col + c);
+		return isEmpty(r*col + c);
 	}
 	std::vector<int> getNearPositions(int dist)
 	{
@@ -101,10 +101,7 @@ public:
 
 		return res;
 	}
-	// Returns (index, -1) for a k-1 row.
-	// Returns (index1, index2) for a k-2 row.
-	// Returns (-1,-1) for nothing.
-	std::pair<int,int> getCriticalPoint(Color color)
+	int getCriticalPoint(Color color)
 	{
 		const int rd[4] = { 1,0,1,1 };
 		const int cd[4] = { 0,1,1,-1 };
@@ -120,26 +117,24 @@ public:
 					if (cnt == winK - 1)
 					{
 						if (canPlay(r, c))
-							return std::make_pair(r*col + c, -1);
+							return r*col + c;
 						else if (canPlay(ir, ic))
-							return std::make_pair(ir*col + ic, -1);
+							return ir*col + ic;
 						continue;
 					}
-					if (cnt == winK - 2 && canPlay(r, c) && canPlay(ir, ic))
-						return std::make_pair(r*col + c, ir*col + ic);
 				}
-		return std::make_pair(-1, -1);
+		return -1;
 	}
 	void fastPlay(Color color)
 	{
 		int index;
 		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
-		std::pair<int, int> c = getCriticalPoint(color), oc = getCriticalPoint(opposite);
+		int c = getCriticalPoint(color), oc = getCriticalPoint(opposite);
 		// Fast decisions
-		if (c.first != -1 && c.second == -1)
-			index = c.first;
-		else if (oc.first != -1 && oc.second == -1)
-			index = oc.first;
+		if (c != -1)
+			index = c;
+		else if (oc != -1)
+			index = oc;
 		else
 		{
 			// Random play
@@ -195,7 +190,7 @@ public:
 				blackPass = true;
 			return PutStoneResult::ACCEPTED;
 		}
-		if (canPlay(index))
+		if (isEmpty(index))
 		{
 			board[index / col][index%col] = color;
 			whitePass = blackPass = false;
