@@ -20,7 +20,7 @@ int main()
 		config >> outputStone;
 		config.close();
 	}
-	cout << "Chicken K_in_A_Line test ver 1" << endl;
+	cout << "Chicken K_in_A_Line test ver 2" << endl;
 	cout << "Input your color(1=Black,-1=White,0=two computer):" << endl;
 	int32_t myColor;
 	cin >> myColor;

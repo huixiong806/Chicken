@@ -162,7 +162,7 @@ public:
 		{
 			auto c = root->children[i].first;
 			auto d = root->children[i].second;
-			std::cout << (row - d / row) << (char)('A' + (d % col)) << " " << c->total << " " << (c->score) / (c->total) * 100 << "%" << std::endl;
+			std::cout  << (char)('A' + (d % col)) << (row - d / row) << " " << c->total << " " << (c->score) / (c->total) * 100 << "%" << std::endl;
 		}
 		root->deleteChildren();
 		delete root;
