@@ -47,7 +47,7 @@ int main()
 		if (color == myColor)
 		{
 			int p; char q;
-			cin >> p >> q;
+			cin >> q >> p;
 			p = siz - p;
 			q = toupper(q) - 'A';
 			index = p * siz + q;
