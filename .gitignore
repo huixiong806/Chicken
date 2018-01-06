@@ -6,5 +6,9 @@ x64/
 .vs/
 ChickenKIR/Release/
 ChickenKIR/Debug/
+ChickenKIR/Profiling/
 ChickenKIR/x64/
 ChickenKIR/config.ini
+*.psess
+*.etl
+*.vspx

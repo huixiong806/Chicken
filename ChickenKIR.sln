@@ -1,14 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChickenKIR", "ChickenKIR\ChickenKIR.vcxproj", "{814E5CA7-0D32-45A7-B647-56C813A15721}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Profiling|x64 = Profiling|x64
+		Profiling|x86 = Profiling|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -17,6 +22,10 @@ Global
 		{814E5CA7-0D32-45A7-B647-56C813A15721}.Debug|x64.Build.0 = Debug|x64
 		{814E5CA7-0D32-45A7-B647-56C813A15721}.Debug|x86.ActiveCfg = Debug|Win32
 		{814E5CA7-0D32-45A7-B647-56C813A15721}.Debug|x86.Build.0 = Debug|Win32
+		{814E5CA7-0D32-45A7-B647-56C813A15721}.Profiling|x64.ActiveCfg = Profiling|x64
+		{814E5CA7-0D32-45A7-B647-56C813A15721}.Profiling|x64.Build.0 = Profiling|x64
+		{814E5CA7-0D32-45A7-B647-56C813A15721}.Profiling|x86.ActiveCfg = Profiling|Win32
+		{814E5CA7-0D32-45A7-B647-56C813A15721}.Profiling|x86.Build.0 = Profiling|Win32
 		{814E5CA7-0D32-45A7-B647-56C813A15721}.Release|x64.ActiveCfg = Release|x64
 		{814E5CA7-0D32-45A7-B647-56C813A15721}.Release|x64.Build.0 = Release|x64
 		{814E5CA7-0D32-45A7-B647-56C813A15721}.Release|x86.ActiveCfg = Release|Win32
@@ -27,5 +36,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B472C13E-A975-468E-A413-C1A4E995A01F}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal
