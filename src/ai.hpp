@@ -1,4 +1,4 @@
-#ifndef AI_HPP
+ï»¿#ifndef AI_HPP
 #define AI_HPP
 #include"game.hpp"
 #include<vector>
@@ -21,7 +21,7 @@ private:
 	}
 	void expand(Game<row, col>& board)
 	{	
-		//À©Õ¹³öËùÓĞ×Ó½Úµã
+		// æ‰©å±•å‡ºæ‰€æœ‰å­èŠ‚ç‚¹
 		std::vector<int> indices = board.getNearPositions(board.getWink() / 2);
 		//indices.push_back(row*col);
 		for (auto i: indices)
@@ -37,7 +37,7 @@ private:
 		std::pair<TreeNode*, int32_t> choice= std::make_pair(nullptr,-1);
 		for (auto&& child: children)
 		{
-			//´æÔÚ»¹Î´À©Õ¹µÄ×Ó½Úµã£¬ÔòÀ©Õ¹Ëü
+			// å­˜åœ¨è¿˜æœªæ‰©å±•çš„å­èŠ‚ç‚¹ï¼Œåˆ™æ‰©å±•å®ƒ
 			if (child.first->total == 0)
 				return child;
 			double nowScore = (child.first->score / child.first->total) + selectConst*sqrt(log(this->total) / child.first->total)+(rand()%10)*0.0001;
@@ -107,7 +107,7 @@ public:
 			value = (double)result*0.5+0.5;
 		}else value = ((double)board.getResult()*0.5+0.5);
 		for (TreeNode* node : visited)
-			//Èô´Ë½ÚµãÏÂÒ»²½¸ÃºÚÆå×ß£¬ÄÇÃ´°×ÆåÑ¡Ôñ´Ë½ÚµãµÄµÃ·Ö¸ÃÎªºÚÆå»ñÊ¤×´¿öÈ¡·´¡£
+			// è‹¥æ­¤èŠ‚ç‚¹ä¸‹ä¸€æ­¥è¯¥é»‘æ£‹èµ°ï¼Œé‚£ä¹ˆç™½æ£‹é€‰æ‹©æ­¤èŠ‚ç‚¹çš„å¾—åˆ†è¯¥ä¸ºé»‘æ£‹è·èƒœçŠ¶å†µå–åã€‚
 			node->updateStats((node->color==Color::BLACK)?1.0-value:value);
 				
 	}
@@ -155,7 +155,7 @@ public:
 				winRate = (child.first->score)/(child.first->total);
 			}
 		}
-		if (winRate < 0.1)return row*col + 1;//ÈÏÊä
+		if (winRate < 0.1)return row*col + 1; // è®¤è¾“
 		sort(root->children.begin(), root->children.end(), cmp<row, col>);
 		std::cout << "result: " << std::endl;
 		for (int32_t i = 0; i<=5&&i < root->children.size(); ++i)

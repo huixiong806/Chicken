@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 Copyright 2017 orangebird.
 Publish under GNU General Public License v3.0 Licence.
 */
@@ -169,7 +169,7 @@ public:
 				}
 		return false;
 	}
-	//»ñÈ¡Ê¤ÀûµÄÒ»·½(0±íÊ¾Ã»ÓĞÈËÊ¤Àû)
+	// è·å–èƒœåˆ©çš„ä¸€æ–¹(0è¡¨ç¤ºæ²¡æœ‰äººèƒœåˆ©)
 	Color getResult()
 	{
 		if (isWin(Color::BLACK))
@@ -178,7 +178,7 @@ public:
 			return Color::WHITE;
 		return Color::EMPTY;
 	}
-	//Âä×Ó
+	// è½å­
 	PutStoneResult play(size_t index, Color color)
 	{
 		if (index == row * col)
@@ -261,30 +261,30 @@ public:
 				{
 					//std::cout << " .";
 					if (i == 0 && j == 0)
-						std::cout << "©³";
+						std::cout << "â”";
 					else if (i == row - 1 && j == 0)
-						std::cout << "©»";
+						std::cout << "â”—";
 					else if (i == 0 && j == col - 1)
-						std::cout << "©·";
+						std::cout << "â”“";
 					else if (i == row - 1 && j == col - 1)
-						std::cout << "©¿";
+						std::cout << "â”›";
 					else if (i == 0)
-						std::cout << "©Ó";
+						std::cout << "â”¯";
 					else if (i == row - 1)
-						std::cout << "©Û";
+						std::cout << "â”·";
 					else if (j == 0)
-						std::cout << "©Ä";
+						std::cout << "â” ";
 					else if (j == col - 1)
-						std::cout << "©Ì";
-					else std::cout << "©à";
+						std::cout << "â”¨";
+					else std::cout << "â”¼";
 				}
 				else if (board[i][j] == Stone::BLACK)
 				{
-					//std::cout << "¡ñ";
-					std::cout << "¡ğ";
+					//std::cout << "â—";
+					std::cout << "â—‹";
 				}
-				//std::cout << "¡ğ";
-				else std::cout << "¡ñ";
+				//std::cout << "â—‹";
+				else std::cout << "â—";
 			}
 			if ((row - i) < 10)
 				std::cout << " " << (row - i);
