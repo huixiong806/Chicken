@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright 2017 orangebird.
 Publish under GNU General Public License v3.0 Licence.
 */
@@ -52,24 +52,30 @@ int main()
 			q = toupper(q) - 'A';
 			index = p * siz + q;
 		}
-		else index=ai.genMove(game,(Color)color,playout);
+		else index = ai.genMove(game, (Color)color, playout); // siz * siz + 2 for fast play
 		if (index == siz * siz + 1)
 		{
 			cout << (color > 0 ? "Black" : "White") << " resigned." << endl;
 			winner = -color;
 			break;
 		}
-		if (index == siz * siz + 2) game.fastPlay((Stone)color); // For debugging
-		else game.play(index, (Stone)color);
-		if (outputStone) game.outputStone(); else game.output();
+		else if (index == siz * siz + 2)
+			game.fastPlay((Stone)color); // For debugging
+		else
+			game.play(index, (Stone)color);
+		if (outputStone)
+			game.outputStone();
+		else
+			game.output();
 		cout << endl;
 		color = -color;
 	}
 	Color result = game.getResult();
-	if(winner==0)
-	cout << (result==Color::BLACK ? "Black Win" : result == Color::WHITE?"White Win":"Tie") << endl;
-	else cout <<(winner > 0 ? "Black Win" : "White Win") << endl;
+	if (winner == 0)
+		cout << (result == Color::BLACK ? "Black Win" : result == Color::WHITE ? "White Win" : "Tie") << endl;
+	else
+		cout << (winner > 0 ? "Black Win" : "White Win") << endl;
 	cout << "press q to quit" << endl;
-	while (getchar()!='q');
+	while (getchar() != 'q');
 	return 0;
 }

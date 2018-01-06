@@ -1,4 +1,4 @@
-#ifndef BOARD_HPP
+﻿#ifndef BOARD_HPP
 #define BOARD_HPP
 #include<string>
 enum class Stone:int32_t
@@ -18,11 +18,11 @@ public:
 	{
 		return gird[index];
 	}
-	const Stone& getGirdC(size_t x, size_t y)const
+	const Stone& getGridColor(size_t x, size_t y)const
 	{
 		return gird[x][y];
 	}
-	const Stone& getGirdC(size_t index)const
+	const Stone& getGridColor(size_t index)const
 	{
 		return gird[index/col][index%col];
 	}
@@ -37,7 +37,7 @@ public:
 		for (int i = 0; i < row; ++i)
 		{
 			for (int j = 0; j < col; ++j)
-				if (gird[i][j] < rhs.getGirdC(i, j))
+				if (gird[i][j] < rhs.getGridColor(i, j))
 					return true;
 		}
 		return false;

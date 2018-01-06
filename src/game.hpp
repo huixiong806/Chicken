@@ -11,6 +11,7 @@ Publish under GNU General Public License v3.0 Licence.
 #include <vector>
 #include <queue>
 #include <algorithm>
+#include <cassert>
 #include "hash.hpp"
 const double value[2][4] =
 { {0.3,0.5,3.0,10.0},
@@ -26,7 +27,7 @@ class Game
 {
 private:
 	Board<row, col> board;
-	int32_t winK, randomPlayRange;
+	int32_t winK, fastPlayRange;
 	bool blackPass, whitePass;
 	int* distField;
 protected:
@@ -38,12 +39,12 @@ public:
 	Game()
 	{
 		winK = 5;
-		randomPlayRange = 2;
+		fastPlayRange = 2;
 		blackPass = false;
 		whitePass = false;
 		distField = new int[row*col];
 	}
-	Game(const Game& r) :board(r.board), winK(r.winK), randomPlayRange(r.randomPlayRange), blackPass(r.blackPass), whitePass(r.whitePass)
+	Game(const Game& r) :board(r.board), winK(r.winK), fastPlayRange(r.fastPlayRange), blackPass(r.blackPass), whitePass(r.whitePass)
 	{
 		distField = new int[row*col];
 		copy(r.distField, r.distField + row * col, distField);
@@ -55,7 +56,7 @@ public:
 	bool isEmpty(size_t index)
 	{
 		if (index == row * col) return true;
-		return board.getGirdC(index) == Stone::EMPTY;
+		return board.getGridColor(index) == Stone::EMPTY;
 	}
 	bool inside(int r, int c)
 	{
@@ -74,7 +75,7 @@ public:
 		memset(d, -1, sizeof(int)*row*col);
 		for (int i = 0; i < row; i++)
 			for (int j = 0; j < col; j++)
-				if (board.getGirdC(i, j) != Stone::EMPTY)
+				if (board.getGridColor(i, j) != Stone::EMPTY)
 				{
 					q.push(i*col+j);
 					d[i*col + j] = 0;
@@ -113,9 +114,9 @@ public:
 				for (int k = 0; k < 4; k++)
 				{
 					int ir = i - rd[k], ic = j - cd[k];
-					if (inside(ir, ic) && board.getGirdC(ir, ic) == color) continue;
+					if (inside(ir, ic) && board.getGridColor(ir, ic) == color) continue;
 					int r = i, c = j, cnt = 0;
-					while (cnt < winK && inside(r, c) && board.getGirdC(r, c) == color)
+					while (cnt < winK && inside(r, c) && board.getGridColor(r, c) == color)
 						r += rd[k], c += cd[k], cnt++;
 					if (cnt == winK - 1)
 					{
@@ -128,22 +129,76 @@ public:
 				}
 		return -1;
 	}
+	// {opposite, self}
+	std::pair<int, int> calcScore(Color color, int r, int c)
+	{
+		assert(winK <= row && winK <= col);
+		const int rd[4] = { 1,0,1,1 };
+		const int cd[4] = { 0,1,1,-1 };
+		const int selfScores[6] = { 0,200,400,2000,1000000,0 };
+		const int oppositeScores[6] = { 0,300,500,3000,100000,0 };
+		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
+		pair<int, int> res;
+		for (int k = 0; k < 4; k++)
+		{
+			int cnt = 0, cnto = 0;
+			//printf("> k = %d\n", k);
+			int rr = r - rd[k] * (winK - 1), cc = c - cd[k] * (winK - 1); // Current position
+			int r1 = r + rd[k] * winK, c1 = c + cd[k] * winK;
+			while (!inside(rr, cc)) rr += rd[k], cc += cd[k];
+			for (int i = 0; i < winK - 1; i++)
+			{
+				if (board.getGridColor(rr, cc) == color)
+					cnt++;
+				if (board.getGridColor(rr, cc) == opposite)
+					cnto++;
+				//printf(" %d %d [pre]\n", rr, cc);
+				rr += rd[k], cc += cd[k];
+			}
+			do
+			{
+				if (board.getGridColor(rr, cc) == color)
+					cnt++;
+				if (board.getGridColor(rr, cc) == opposite)
+					cnto++;
+				res.first += oppositeScores[cnto];
+				res.second += selfScores[cnt];
+				//printf(" %d %d - %d %d [sum] %d %d\n", rr - (winK - 1) * rd[k], cc - (winK - 1) * cd[k], rr, cc, cnto, cnt);
+				rr += rd[k], cc += cd[k];
+				if (board.getGridColor(rr - winK * rd[k], cc - winK * cd[k]) == color)
+					cnt--;
+				if (board.getGridColor(rr - winK * rd[k], cc - winK * cd[k]) == opposite)
+					cnto--;
+			} while (inside(rr, cc) && (rr != r1 || cc != c1));
+		}
+		return res;
+	}
 	void fastPlay(Color color)
 	{
-		int index;
-		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
-		int c = getCriticalPoint(color), oc = getCriticalPoint(opposite);
-		// Fast decisions
-		if (c != -1)
-			index = c;
-		else if (oc != -1)
-			index = oc;
-		else
+		int index = row * col + 1;
+		std::pair<int, int> maxScore = make_pair(-1, -1);
+		std::vector<int32_t> indices = getNearPositions(fastPlayRange), pool;
+		for (auto i : indices)
 		{
-			// Random play
-			std::vector<int32_t> pool = getNearPositions(randomPlayRange);
-			index = pool[rand() % pool.size()];
+			std::pair<int, int> score = calcScore(color, i / col, i % col);
+			if (score.first < score.second) std::swap(score.first, score.second);
+			if (score > maxScore)
+			{
+				maxScore = score;
+				pool.clear();
+				pool.push_back(i);
+			}
+			else if (score == maxScore)
+				pool.push_back(i);
 		}
+		if (!pool.empty()) index = pool[rand() % pool.size()];
+		/*
+		if (index != row * col + 1)
+		{
+			pair<int, int> score = calcScore((Stone)color, index / col, index % col);
+			printf("Score@(%d, %d) [opposite / self]: %d / %d\n", index / col, index % col, score.first, score.second);
+		}
+		*/
 		play(index, color);
 	}
 	bool gameOver()
@@ -151,7 +206,7 @@ public:
 		if (blackPass&&whitePass)return true;
 		if (getResult() != Color::EMPTY) return true;
 		for (size_t index = 0; index < row*col; ++index)
-			if (board.getGirdC(index) == Stone::EMPTY)
+			if (board.getGridColor(index) == Stone::EMPTY)
 				return false;
 		return true;
 	}
@@ -164,9 +219,9 @@ public:
 				for (int k = 0; k < 4; k++)
 				{
 					int ir = i - rd[k], ic = j - cd[k];
-					if (inside(ir, ic) && board.getGirdC(ir, ic) == color) continue;
+					if (inside(ir, ic) && board.getGridColor(ir, ic) == color) continue;
 					int r = i, c = j, cnt = 0;
-					while (cnt < winK && inside(r, c) && board.getGirdC(r, c) == color)
+					while (cnt < winK && inside(r, c) && board.getGridColor(r, c) == color)
 						r += rd[k], c += cd[k], cnt++;
 					if (cnt == winK) return true;
 				}
