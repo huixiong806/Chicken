@@ -32,7 +32,7 @@ private:
 	int* distField;
 protected:
 public:
-	int32_t getWink()
+	int32_t getWinK()
 	{
 		return winK;
 	}
@@ -184,7 +184,7 @@ public:
 		const int rd[4] = { 1,0,1,1 };
 		const int cd[4] = { 0,1,1,-1 };
 		const int selfScores[6] = { 0,200,400,2000,1000000,0 };
-		const int oppositeScores[6] = { 0,300,600,10000,100000,0 };
+		const int oppositeScores[6] = { 0,300,600,3000,100000,0 };
 		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
 		pair<int, int> res;
 		for (int k = 0; k < 4; k++)
@@ -265,6 +265,21 @@ public:
 	void fastPlay(Color color)
 	{
 		play(fastDecision(color), color);
+	}
+	double estimate(Color color)
+	{
+		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
+		std::pair<int, int> msc = make_pair(-1, -1), mso = make_pair(-1, -1);
+		std::vector<int32_t> indices = getNearPositions(winK);
+		for (auto i : indices)
+		{
+			std::pair<int, int> s = calcScore(color, i / siz, i % siz), so = calcScore(opposite, i / siz, i % siz);
+			if (s.first < s.second) std::swap(s.first, s.second);
+			if (so.first < so.second) std::swap(so.first, so.second);
+			msc = max(msc, s);
+			mso = max(mso, so);
+		}
+		return min(1.0, (msc.first - mso.first) / 1000000.0) * 0.5 + 0.5;
 	}
 	bool gameOver()
 	{

@@ -20,7 +20,7 @@ int main()
 		config >> outputStone;
 		config.close();
 	}
-	cout << "Chicken K_in_A_Line test ver 2" << endl;
+	cout << "Chicken K_in_A_Line test ver 2.1 - fastplayless" << endl;
 	cout << "Input your color(1=Black,-1=White,0=two computer):" << endl;
 	int32_t myColor;
 	cin >> myColor;
@@ -43,6 +43,7 @@ int main()
 	while (!game.gameOver())
 	{
 		cout << (color > 0 ? "Black's turn" : "White's turn") << endl;
+		printf("Estimated winning rate for current color: %.6lf\n", game.estimate((Color)color));
 		size_t index;
 		if (color == myColor)
 		{

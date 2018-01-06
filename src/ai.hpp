@@ -35,7 +35,7 @@ private:
 		else if (co.first == 3)
 			indices = co.second;
 		else
-			indices = board.getNearPositions(board.getWink() / 2);
+			indices = board.getNearPositions(board.getWinK() / 2);
 		// indices.push_back(row * col + 1);
 		for (auto i: indices)
 		{
@@ -67,19 +67,23 @@ private:
 		score += value;
 		total += 1;
 	}
-	int32_t rollOut(const Game<row, col>& board)
+	double rollOut(const Game<row, col>& board)
 	{
-		Game<row,col>temp = board;
+		Game<row,col> temp = board;
 		int32_t curColor = (int32_t)color;
-		for (int i = 0; i < row*col / 4; i++)
+		for (int i = 0; i < 0; i++)
 		{
 			temp.fastPlay((Color)curColor);
 			//temp.output();
 			if (temp.gameOver()) break;
 			curColor = -curColor;
 		}
-		if (temp.gameOver()) return (int32_t)temp.getResult();
-		return 0;
+		if (temp.gameOver()) return (int32_t)temp.getResult() * 0.5 + 0.5;
+
+		// Rate by score
+		double res = temp.estimate((Color)curColor);
+		if ((Color)curColor != color) res = 1.0 - res;
+		return res;
 	}
 public:
 	void deleteChildren()
@@ -118,13 +122,14 @@ public:
 			board.play(next.second, cur->color);
 			TreeNode* newNode = next.first;
 			visited.push_back(newNode);
-			int32_t result = newNode->rollOut(board);
-			value = (double)result*0.5+0.5;
-		}else value = ((double)board.getResult()*0.5+0.5);
+			double result = newNode->rollOut(board);
+			value = result;
+		}
+		else
+			value = ((double)board.getResult() * 0.5 + 0.5);
 		for (TreeNode* node : visited)
 			// 若此节点下一步该黑棋走，那么白棋选择此节点的得分该为黑棋获胜状况取反。
-			node->updateStats((node->color==Color::BLACK)?1.0-value:value);
-				
+			node->updateStats((node->color == Color::BLACK) ? 1.0 - value : value);	
 	}
 };
 template<size_t row, size_t col>
