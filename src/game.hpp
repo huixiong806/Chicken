@@ -105,29 +105,77 @@ public:
 
 		return res;
 	}
-	int getCriticalPoint(Color color)
+	// {length, points}
+	// isNextMove: is it the color's turn?
+	std::pair<int, std::vector<int>> getCriticalPoints(Color color, bool isNextMove)
 	{
+		// "x" for color `color`, "o" for opposite color
+		// List in the same direction as the `while` loop
 		const int rd[4] = { 1,0,1,1 };
 		const int cd[4] = { 0,1,1,-1 };
-		for (int i = 0; i < row; i++)
-			for (int j = 0; j < col; j++)
-				for (int k = 0; k < 4; k++)
+		int length = -1;
+		std::vector<int> res;
+		for (int i = 0; i < row && length == -1; i++)
+			for (int j = 0; j < col && length == -1; j++)
+				for (int k = 0; k < 4 && length == -1; k++)
 				{
 					int ir = i - rd[k], ic = j - cd[k];
 					if (inside(ir, ic) && board.getGridColor(ir, ic) == color) continue;
 					int r = i, c = j, cnt = 0;
 					while (cnt < winK && inside(r, c) && board.getGridColor(r, c) == color)
 						r += rd[k], c += cd[k], cnt++;
-					if (cnt == winK - 1)
+					if (cnt == winK - 1) // xxxx
 					{
-						if (canPlay(r, c))
-							return r*col + c;
-						else if (canPlay(ir, ic))
-							return ir*col + ic;
+						if (canPlay(r, c)) // xxxx.
+						{
+							length = 4;
+							res.push_back(r*col + c);
+						}
+						else if (canPlay(ir, ic)) // .xxxx
+						{
+							length = 4;
+							res.push_back(ir*col + ic);
+						}
 						continue;
 					}
+					if (cnt == winK - 2) // xxx
+					{
+						int r2 = r + rd[k], c2 = c + cd[k];
+						int ir2 = ir - rd[k], ic2 = ic - cd[k];
+						bool f = canPlay(r, c), f2 = canPlay(r2, c2);
+						bool i = canPlay(ir, ic), i2 = canPlay(ir2, ic2);
+						if (f && i) {
+							if (!f2 && !i2) continue;
+							length = 3;
+							if (f2 && i2) // ..xxx..
+							{
+								res.push_back(ir*col + ic);
+								res.push_back(r*col + c);
+							}
+							else if (f2 && !i2 && isNextMove) // o.xxx..
+							{
+								res.push_back(r*col + c);
+							}
+							else if (f2 && !i2 && !isNextMove) // o.xxx..
+							{
+								res.push_back(ir*col + ic);
+								res.push_back(r*col + c);
+								res.push_back(r2*col + c2);
+							}
+							else if (!f2 && i2 && isNextMove) // ..xxx.o
+							{
+								res.push_back(ir*col + ic);
+							}
+							else if (!f2 && i2 && !isNextMove) // ..xxx.o
+							{
+								res.push_back(ir2*col + ic2);
+								res.push_back(ir*col + ic);
+								res.push_back(r*col + c);
+							}
+						}
+					}
 				}
-		return -1;
+		return std::make_pair(length, res);
 	}
 	// {opposite, self}
 	std::pair<int, int> calcScore(Color color, int r, int c)
@@ -173,8 +221,20 @@ public:
 		}
 		return res;
 	}
-	void fastPlay(Color color)
+	int fastDecision(Color color)
 	{
+		// Critical points test
+		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
+		std::pair<int, std::vector<int>> c = getCriticalPoints(color, true), co = getCriticalPoints(opposite, false);
+		if (c.first == 4 && c.second.size() == 1)
+			return c.second[0];
+		else if (co.first == 4 && co.second.size() == 1)
+			return co.second[0];
+		else if (c.first == 3)
+			return c.second[0];
+		else if (co.first == 3)
+			return co.second[rand() % co.second.size()]; // I just randomized here...
+		// Select by score
 		int index = row * col + 1;
 		std::pair<int, int> maxScore = make_pair(-1, -1);
 		std::vector<int32_t> indices = getNearPositions(fastPlayRange), pool;
@@ -196,15 +256,19 @@ public:
 		/*
 		if (index != row * col + 1)
 		{
-			pair<int, int> score = calcScore((Stone)color, index / col, index % col);
-			printf("Score@(%d, %d) [opposite / self]: %d / %d\n", index / col, index % col, score.first, score.second);
+		pair<int, int> score = calcScore((Stone)color, index / col, index % col);
+		printf("Score@(%d, %d) [opposite / self]: %d / %d\n", index / col, index % col, score.first, score.second);
 		}
 		*/
-		play(index, color);
+		return index;
+	}
+	void fastPlay(Color color)
+	{
+		play(fastDecision(color), color);
 	}
 	bool gameOver()
 	{
-		if (blackPass&&whitePass)return true;
+		if (blackPass && whitePass) return true;
 		if (getResult() != Color::EMPTY) return true;
 		for (size_t index = 0; index < row*col; ++index)
 			if (board.getGridColor(index) == Stone::EMPTY)

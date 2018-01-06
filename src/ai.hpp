@@ -22,8 +22,21 @@ private:
 	void expand(Game<row, col>& board)
 	{	
 		// 扩展出所有子节点
-		std::vector<int> indices = board.getNearPositions(board.getWink() / 2);
-		//indices.push_back(row*col+1);
+		std::vector<int> indices;
+		// Critical points test
+		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
+		std::pair<int, std::vector<int>> c = board.getCriticalPoints(color, true), co = board.getCriticalPoints(opposite, false);
+		if (c.first == 4 && c.second.size() == 1)
+			indices = c.second;
+		else if (co.first == 4 && co.second.size() == 1)
+			indices = co.second;
+		else if (c.first == 3)
+			indices = c.second;
+		else if (co.first == 3)
+			indices = co.second;
+		else
+			indices = board.getNearPositions(board.getWink() / 2);
+		// indices.push_back(row * col + 1);
 		for (auto i: indices)
 		{
 			children.push_back(std::make_pair(nullptr, i));
@@ -34,13 +47,13 @@ private:
 	std::pair<TreeNode*, int32_t> select()
 	{
 		double maxScore = -99999999.0;
-		std::pair<TreeNode*, int32_t> choice= std::make_pair(nullptr,-1);
+		std::pair<TreeNode*, int32_t> choice = std::make_pair(nullptr, -1);
 		for (auto&& child: children)
 		{
 			// 存在还未扩展的子节点，则扩展它
 			if (child.first->total == 0)
 				return child;
-			double nowScore = (child.first->score / child.first->total) + selectConst*sqrt(log(this->total) / child.first->total)+(rand()%10)*0.0001;
+			double nowScore = (child.first->score / child.first->total) + selectConst * sqrt(log(this->total) / child.first->total) + (rand() % 10)*0.0001;
 			if (nowScore > maxScore)
 			{
 				maxScore = nowScore;
