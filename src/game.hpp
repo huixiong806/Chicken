@@ -28,6 +28,7 @@ private:
 	Board<row, col> board;
 	int32_t winK, randomPlayRange;
 	bool blackPass, whitePass;
+	int* distField;
 protected:
 public:
 	int32_t getWink()
@@ -40,14 +41,17 @@ public:
 		randomPlayRange = 2;
 		blackPass = false;
 		whitePass = false;
+		distField = new int[row*col];
 	}
-	/*
-	Game(const int32_t winK_) :winK(winK_)
+	Game(const Game& r) :board(r.board), winK(r.winK), randomPlayRange(r.randomPlayRange), blackPass(r.blackPass), whitePass(r.whitePass)
 	{
-		blackPass = false;
-		whitePass = false;
+		distField = new int[row*col];
+		copy(r.distField, r.distField + row * col, distField);
 	}
-	*/
+	~Game()
+	{
+		delete[] distField;
+	}
 	bool isEmpty(size_t index)
 	{
 		if (index == row * col) return true;
@@ -65,8 +69,7 @@ public:
 	std::vector<int> getNearPositions(int dist)
 	{
 		std::queue<size_t> q;
-		std::unique_ptr<int> dptr(new int[row*col]);
-		int* d = dptr.get();
+		int* d = distField;
 
 		memset(d, -1, sizeof(int)*row*col);
 		for (int i = 0; i < row; i++)
