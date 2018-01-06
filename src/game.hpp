@@ -136,7 +136,7 @@ public:
 		const int rd[4] = { 1,0,1,1 };
 		const int cd[4] = { 0,1,1,-1 };
 		const int selfScores[6] = { 0,200,400,2000,1000000,0 };
-		const int oppositeScores[6] = { 0,300,500,3000,100000,0 };
+		const int oppositeScores[6] = { 0,300,600,10000,100000,0 };
 		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
 		pair<int, int> res;
 		for (int k = 0; k < 4; k++)
@@ -185,6 +185,7 @@ public:
 			if (score > maxScore)
 			{
 				maxScore = score;
+				index = i;
 				pool.clear();
 				pool.push_back(i);
 			}

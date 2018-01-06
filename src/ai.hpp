@@ -23,7 +23,7 @@ private:
 	{	
 		// 扩展出所有子节点
 		std::vector<int> indices = board.getNearPositions(board.getWink() / 2);
-		//indices.push_back(row*col);
+		//indices.push_back(row*col+1);
 		for (auto i: indices)
 		{
 			children.push_back(std::make_pair(nullptr, i));
@@ -58,13 +58,15 @@ private:
 	{
 		Game<row,col>temp = board;
 		int32_t curColor = (int32_t)color;
-		while(!temp.gameOver())
+		for (int i = 0; i < row*col / 4; i++)
 		{
 			temp.fastPlay((Color)curColor);
 			//temp.output();
+			if (temp.gameOver()) break;
 			curColor = -curColor;
 		}
-		return (int32_t)temp.getResult();
+		if (temp.gameOver()) return (int32_t)temp.getResult();
+		return 0;
 	}
 public:
 	void deleteChildren()
@@ -142,7 +144,7 @@ public:
 		}	
 		QueryPerformanceCounter(&endTime);
 		runTime = (((endTime.QuadPart - startTime.QuadPart)*1.0) / cpuFreq.QuadPart);
-		std::cout<<"speed: "<< ((double)playout / (double)runTime) << "n/s" << std::endl;
+		std::cout << "speed: " << ((double)playout / (double)runTime) << "n/s" << std::endl;
 		int32_t maxTimes = -1;
 		size_t choice = 0;
 		double winRate=0;
