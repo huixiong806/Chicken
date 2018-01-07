@@ -281,21 +281,6 @@ public:
 		}
 		return std::min(1.0, (msc.first - mso.first) / 1000000.0) * 0.5 + 0.5;
 	}
-	double estimate(Color color)
-	{
-		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
-		std::pair<int, int> msc = make_pair(-1, -1), mso = make_pair(-1, -1);
-		std::vector<int32_t> indices = getNearPositions(winK);
-		for (auto i : indices)
-		{
-			std::pair<int, int> s = calcScore(color, i / siz, i % siz), so = calcScore(opposite, i / siz, i % siz);
-			if (s.first < s.second) std::swap(s.first, s.second);
-			if (so.first < so.second) std::swap(so.first, so.second);
-			msc = max(msc, s);
-			mso = max(mso, so);
-		}
-		return min(1.0, (msc.first - mso.first) / 1000000.0) * 0.5 + 0.5;
-	}
 	bool gameOver()
 	{
 		if (blackPass && whitePass) return true;

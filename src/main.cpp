@@ -10,7 +10,7 @@ Publish under GNU General Public License v3.0 Licence.
 #include<algorithm>
 #include<thread>
 using namespace std;
-const int siz =15;
+const int siz = 15;
 int main()
 {
 	bool outputStone = true;
