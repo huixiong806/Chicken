@@ -29,7 +29,8 @@ private:
 	Board<row, col> board;
 	int32_t winK, fastPlayRange;
 	bool blackPass, whitePass;
-	int* distField;
+	int32_t* distField;
+	int32_t* estimateValue;
 protected:
 public:
 	int32_t getWink()
@@ -42,16 +43,30 @@ public:
 		fastPlayRange = 2;
 		blackPass = false;
 		whitePass = false;
-		distField = new int[row*col];
+		distField = new int32_t[row*col];
+		estimateValue = new int32_t[405];
+	}
+	Game(int32_t* estimateValue_)
+	{
+		winK = 5;
+		fastPlayRange = 2;
+		blackPass = false;
+		whitePass = false;
+		distField = new int32_t[row*col];
+		estimateValue = new int32_t[405];
+		copy(estimateValue_, estimateValue_ + 405, estimateValue);
 	}
 	Game(const Game& r) :board(r.board), winK(r.winK), fastPlayRange(r.fastPlayRange), blackPass(r.blackPass), whitePass(r.whitePass)
 	{
-		distField = new int[row*col];
+		distField = new int32_t[row*col];
+		estimateValue = new int32_t[405];
 		copy(r.distField, r.distField + row * col, distField);
+		copy(r.estimateValue, r.estimateValue + row * col, estimateValue);
 	}
 	~Game()
 	{
 		delete[] distField;
+		delete[] estimateValue;
 	}
 	bool isEmpty(size_t index)
 	{
@@ -178,52 +193,62 @@ public:
 		return std::make_pair(length, res);
 	}
 	// {opposite, self}
-	std::pair<int, int> calcScore(Color color, int r, int c)
+	/*int32_t*/
+	int32_t calcScore(Color color, int r, int c, const int32_t* estimateValue_)
 	{
 		assert(winK <= row && winK <= col);
 		const int rd[4] = { 1,0,1,1 };
 		const int cd[4] = { 0,1,1,-1 };
-		const int selfScores[6] = { 0,200,400,2000,1000000,0 };
-		const int oppositeScores[6] = { 0,300,600,10000,100000,0 };
+		//const int selfScores[6] = { 0,300,500,3000,10000,0 } ;
+		//const int oppositeScores[6] = { 0,200,400,2000,20000,0 };
+		const int pow3[5] = { 1,3,9,27,81 };
 		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
-		pair<int, int> res;
+		//pair<int, int> res;
+		int32_t res=0;
 		for (int k = 0; k < 4; k++)
 		{
+			/*
+			  state为一个"5连"的状态压缩形式
+			  空位的位置*81+第1个非空位置的棋子颜色*27+...+第4个非空位置的棋子颜色
+			  0表示白棋，1表示空，2表示黑棋
+			*/
+			size_t state = 0;
 			int cnt = 0, cnto = 0;
 			//printf("> k = %d\n", k);
 			int rr = r - rd[k] * (winK - 1), cc = c - cd[k] * (winK - 1); // Current position
 			int r1 = r + rd[k] * winK, c1 = c + cd[k] * winK;
 			while (!inside(rr, cc)) rr += rd[k], cc += cd[k];
+			bool insideFlag = true;
+			int32_t target=5;
 			for (int i = 0; i < winK - 1; i++)
 			{
-				if (board.getGridColor(rr, cc) == color)
-					cnt++;
-				if (board.getGridColor(rr, cc) == opposite)
-					cnto++;
+				if (rr == r&&cc == c)//正好是所在空位
+					target = i+1;
+				else state = (state/81*81)+((state%81)*3+(((int32_t)board.getGridColor(rr, cc)*(int32_t)color) + 1))%81;
 				//printf(" %d %d [pre]\n", rr, cc);
 				rr += rd[k], cc += cd[k];
+				if (!inside(rr, cc))
+				{
+					insideFlag = false;
+					break;
+				}
 			}
+			if (!insideFlag)continue;
 			do
 			{
-				if (board.getGridColor(rr, cc) == color)
-					cnt++;
-				if (board.getGridColor(rr, cc) == opposite)
-					cnto++;
-				res.first += oppositeScores[cnto];
-				res.second += selfScores[cnt];
+				target--;
+				state = (target * 81) + ((state % 81) * 3 + (((int32_t)board.getGridColor(rr, cc)*(int32_t)color) + 1)) % 81;
+				res+= estimateValue_[state];
 				//printf(" %d %d - %d %d [sum] %d %d\n", rr - (winK - 1) * rd[k], cc - (winK - 1) * cd[k], rr, cc, cnto, cnt);
 				rr += rd[k], cc += cd[k];
-				if (board.getGridColor(rr - winK * rd[k], cc - winK * cd[k]) == color)
-					cnt--;
-				if (board.getGridColor(rr - winK * rd[k], cc - winK * cd[k]) == opposite)
-					cnto--;
 			} while (inside(rr, cc) && (rr != r1 || cc != c1));
 		}
 		return res;
 	}
-	int fastDecision(Color color)
+	int fastDecision(Color color,const int32_t* estimateValue_)
 	{
 		// Critical points test
+		/*
 		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
 		std::pair<int, std::vector<int>> c = getCriticalPoints(color, true), co = getCriticalPoints(opposite, false);
 		if (c.first == 4 && c.second.size() == 1)
@@ -234,25 +259,27 @@ public:
 			return c.second[0];
 		else if (co.first == 3)
 			return co.second[rand() % co.second.size()]; // I just randomized here...
+		*/
 		// Select by score
 		int index = row * col + 1;
-		std::pair<int, int> maxScore = make_pair(-1, -1);
-		std::vector<int32_t> indices = getNearPositions(fastPlayRange), pool;
+		int32_t maxScore = -1;
+		std::vector<int32_t> indices = getNearPositions(fastPlayRange);//, pool;
 		for (auto i : indices)
 		{
-			std::pair<int, int> score = calcScore(color, i / col, i % col);
-			if (score.first < score.second) std::swap(score.first, score.second);
+			int32_t score = calcScore(color, i / col, i % col, estimateValue_);
+			//if (score.first < score.second) std::swap(score.first, score.second);
 			if (score > maxScore)
 			{
+				//cout << i / col << " " << i%col << endl;
 				maxScore = score;
 				index = i;
-				pool.clear();
-				pool.push_back(i);
+				//pool.clear();
+				//pool.push_back(i);
 			}
-			else if (score == maxScore)
-				pool.push_back(i);
+			//else if (score == maxScore)
+				//pool.push_back(i);
 		}
-		if (!pool.empty()) index = pool[rand() % pool.size()];
+		//if (!pool.empty()) index = pool[rand() % pool.size()];
 		/*
 		if (index != row * col + 1)
 		{
@@ -264,7 +291,11 @@ public:
 	}
 	void fastPlay(Color color)
 	{
-		play(fastDecision(color), color);
+		play(fastDecision(color, estimateValue), color);
+	}
+	void fastPlay(Color color,const int32_t* estimateValue_)
+	{
+		play(fastDecision(color, estimateValue_), color);
 	}
 	bool gameOver()
 	{

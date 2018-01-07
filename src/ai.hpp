@@ -5,7 +5,7 @@
 #include<string>
 #include<math.h>
 #include<Windows.h>
-const double selectConst = 0.3;
+const double selectConst = 0.2;
 /*
  double timecount;
  double avgsteps=0;
@@ -22,7 +22,8 @@ private:
 	void expand(Game<row, col>& board)
 	{	
 		// 扩展出所有子节点
-		std::vector<int> indices;
+		std::vector<int> indices=board.getNearPositions(3);
+		/*
 		// Critical points test
 		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
 		std::pair<int, std::vector<int>> c = board.getCriticalPoints(color, true), co = board.getCriticalPoints(opposite, false);
@@ -37,6 +38,7 @@ private:
 		else
 			indices = board.getNearPositions(board.getWink() / 2);
 		// indices.push_back(row * col + 1);
+		*/
 		for (auto i: indices)
 		{
 			children.push_back(std::make_pair(nullptr, i));

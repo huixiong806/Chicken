@@ -9,10 +9,15 @@ Publish under GNU General Public License v3.0 Licence.
 #include<fstream>
 #include<algorithm>
 #include<thread>
+#include"value_trainner.hpp"
 using namespace std;
 const int siz =15;
+ValueTrainner trainner;
 int main()
 {
+	
+	trainner.train();
+	/*
 	bool outputStone = true;
 	ifstream config("config.ini");
 	if (config.is_open())
@@ -20,7 +25,7 @@ int main()
 		config >> outputStone;
 		config.close();
 	}
-	cout << "Chicken K_in_A_Line test ver 2" << endl;
+	cout << "Chicken K_in_A_Line test ver 3" << endl;
 	cout << "Input your color(1=Black,-1=White,0=two computer):" << endl;
 	int32_t myColor;
 	cin >> myColor;
@@ -33,7 +38,6 @@ int main()
 	fout.open("result.txt");
 	backup = cout.rdbuf();
 	cout.rdbuf(fout.rdbuf());
-	*/
 	srand(time(0));
 	Game<siz, siz> game;
 	if (outputStone) game.outputStone(); else game.output();
@@ -52,7 +56,8 @@ int main()
 			q = toupper(q) - 'A';
 			index = p * siz + q;
 		}
-		else index = ai.genMove(game, (Color)color, playout); // siz * siz + 2 for fast play
+		else index = siz * siz + 2;// ai.genMove(game, (Color)color, playout); // siz * siz + 2 for fast play
+		//else index= ai.genMove(game, (Color)color, playout);
 		if (index == siz * siz + 1)
 		{
 			cout << (color > 0 ? "Black" : "White") << " resigned." << endl;
@@ -77,5 +82,6 @@ int main()
 		cout << (winner > 0 ? "Black Win" : "White Win") << endl;
 	cout << "press q to quit" << endl;
 	while (getchar() != 'q');
+	*/
 	return 0;
 }

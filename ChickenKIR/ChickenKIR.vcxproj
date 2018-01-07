@@ -195,6 +195,7 @@
     <ClInclude Include="..\src\const.h" />
     <ClInclude Include="..\src\game.hpp" />
     <ClInclude Include="..\src\hash.hpp" />
+    <ClInclude Include="..\src\value_trainner.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
