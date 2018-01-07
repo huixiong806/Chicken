@@ -230,10 +230,12 @@ public:
 			return c.second[0];
 		else if (co.first == 4 && co.second.size() == 1)
 			return co.second[0];
+		/*
 		else if (c.first == 3)
 			return c.second[0];
 		else if (co.first == 3)
 			return co.second[rand() % co.second.size()]; // I just randomized here...
+		*/
 		// Select by score
 		int index = row * col + 1;
 		std::pair<int, int> maxScore = std::make_pair(-1, -1);

@@ -5,7 +5,7 @@
 #include<string>
 #include<math.h>
 #include<time.h>
-const double selectConst = 0.3;
+const double selectConst = 0.4;
 /*
  double timecount;
  double avgsteps=0;
@@ -30,10 +30,12 @@ private:
 			indices = c.second;
 		else if (co.first == 4 && co.second.size() == 1)
 			indices = co.second;
+		/*
 		else if (c.first == 3)
 			indices = c.second;
 		else if (co.first == 3)
 			indices = co.second;
+		*/
 		else
 			indices = board.getNearPositions(board.getWinK() / 2);
 		// indices.push_back(row * col + 1);
@@ -71,7 +73,7 @@ private:
 	{
 		Game<row,col> temp = board;
 		int32_t curColor = (int32_t)color;
-		for (int i = 0; i < 0; i++)
+		for (int i = 0; i < 10; i++)
 		{
 			temp.fastPlay((Color)curColor);
 			//temp.output();
