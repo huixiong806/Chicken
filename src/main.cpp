@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright 2017 orangebird.
 Publish under GNU General Public License v3.0 Licence.
 */

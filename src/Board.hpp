@@ -1,4 +1,4 @@
-﻿#ifndef BOARD_HPP
+#ifndef BOARD_HPP
 #define BOARD_HPP
 #include<string>
 enum class Stone:int32_t

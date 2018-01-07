@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright 2017 orangebird.
 Publish under GNU General Public License v3.0 Licence.
 */
@@ -47,7 +47,7 @@ public:
 	Game(const Game& r) :board(r.board), winK(r.winK), fastPlayRange(r.fastPlayRange), blackPass(r.blackPass), whitePass(r.whitePass)
 	{
 		distField = new int[row*col];
-		copy(r.distField, r.distField + row * col, distField);
+		std::copy(r.distField, r.distField + row * col, distField);
 	}
 	~Game()
 	{
@@ -186,7 +186,7 @@ public:
 		const int selfScores[6] = { 0,200,400,2000,1000000,0 };
 		const int oppositeScores[6] = { 0,300,600,3000,100000,0 };
 		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
-		pair<int, int> res;
+		std::pair<int, int> res;
 		for (int k = 0; k < 4; k++)
 		{
 			int cnt = 0, cnto = 0;
@@ -236,7 +236,7 @@ public:
 			return co.second[rand() % co.second.size()]; // I just randomized here...
 		// Select by score
 		int index = row * col + 1;
-		std::pair<int, int> maxScore = make_pair(-1, -1);
+		std::pair<int, int> maxScore = std::make_pair(-1, -1);
 		std::vector<int32_t> indices = getNearPositions(fastPlayRange), pool;
 		for (auto i : indices)
 		{
@@ -265,6 +265,21 @@ public:
 	void fastPlay(Color color)
 	{
 		play(fastDecision(color), color);
+	}
+	double estimate(Color color)
+	{
+		Color opposite = color == Color::BLACK ? Color::WHITE : Color::BLACK;
+		std::pair<int, int> msc = std::make_pair(-1, -1), mso = std::make_pair(-1, -1);
+		std::vector<int32_t> indices = getNearPositions(winK);
+		for (auto i : indices)
+		{
+			std::pair<int, int> s = calcScore(color, i / col, i % col), so = calcScore(opposite, i / col, i % col);
+			if (s.first < s.second) std::swap(s.first, s.second);
+			if (so.first < so.second) std::swap(so.first, so.second);
+			msc = std::max(msc, s);
+			mso = std::max(mso, so);
+		}
+		return std::min(1.0, (msc.first - mso.first) / 1000000.0) * 0.5 + 0.5;
 	}
 	double estimate(Color color)
 	{
@@ -387,7 +402,7 @@ public:
 		{
 			std::cout << " " << (char)(j + 'A');
 		}
-		std::cout << endl;
+		std::cout << std::endl;
 		for (int i = 0; i < row; ++i)
 		{
 			if ((row - i) < 10)
@@ -434,7 +449,7 @@ public:
 		{
 			std::cout << " " << (char)(j + 'A');
 		}
-		std::cout << endl;
+		std::cout << std::endl;
 	}
 };
 #endif

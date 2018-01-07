@@ -1,10 +1,10 @@
-﻿#ifndef AI_HPP
+#ifndef AI_HPP
 #define AI_HPP
 #include"game.hpp"
 #include<vector>
 #include<string>
 #include<math.h>
-#include<Windows.h>
+#include<time.h>
 const double selectConst = 0.3;
 /*
  double timecount;
@@ -147,21 +147,22 @@ public:
 	MonteCarloTreeSearchAI() {}
 	size_t genMove(const Game<row, col>& board, Color color,int32_t playout)
 	{
-		LARGE_INTEGER cpuFreq;
-		LARGE_INTEGER startTime;
-		LARGE_INTEGER endTime;
+		//LARGE_INTEGER cpuFreq;
+		//LARGE_INTEGER startTime;
+		//LARGE_INTEGER endTime;
 		root = new TreeNode<row, col>();
 		root->color = color;
 		double runTime = 0;
-		QueryPerformanceFrequency(&cpuFreq);
-		QueryPerformanceCounter(&startTime);
+		//QueryPerformanceFrequency(&cpuFreq);
+		//QueryPerformanceCounter(&startTime);
+		int tt=clock();
 		for(size_t t=1;t<=playout;++t)
 		{
 			myBoard = board;
 			root->selectAction(myBoard);
 		}	
-		QueryPerformanceCounter(&endTime);
-		runTime = (((endTime.QuadPart - startTime.QuadPart)*1.0) / cpuFreq.QuadPart);
+		//QueryPerformanceCounter(&endTime);
+		runTime = (clock() - tt) / (double)CLOCKS_PER_SEC;
 		std::cout << "speed: " << ((double)playout / (double)runTime) << "n/s" << std::endl;
 		int32_t maxTimes = -1;
 		size_t choice = 0;
