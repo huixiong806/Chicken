@@ -12,7 +12,7 @@ Publish under GNU General Public License v3.0 Licence.
 #include<thread>
 #include <cstdlib>
 #include "const.h"
-std::ofstream network_train("K:\\编程\\Chicken\\Debug\\train.txt");
+std::ofstream network_train(".\\train.txt");
 #ifdef _DEBUG
 #pragma comment(lib,"..\\lib\\fanndoubled.lib")
 #else
