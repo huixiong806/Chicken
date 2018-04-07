@@ -4,7 +4,12 @@
 #include<vector>
 #include<string>
 #include<math.h>
+#include <queue>
+#include <map>
 #include<Windows.h>
+#include <iomanip>
+extern double *calc_out;
+extern std::ofstream network_train;
 const double selectConst = 0.2;
 /*
  double timecount;
@@ -144,6 +149,7 @@ public:
 	MonteCarloTreeSearchAI() {}
 	size_t genMove(const Game<row, col>& board, Color color,int32_t playout)
 	{
+		static int count;
 		LARGE_INTEGER cpuFreq;
 		LARGE_INTEGER startTime;
 		LARGE_INTEGER endTime;
@@ -175,12 +181,41 @@ public:
 		if (winRate < 0.1)return row*col + 1; // 认输
 		sort(root->children.begin(), root->children.end(), cmp<row, col>);
 		std::cout << "result: " << std::endl;
+		map<int,double> seo;
 		for (int32_t i = 0; i<=5&&i < root->children.size(); ++i)
 		{
 			auto c = root->children[i].first;
 			auto d = root->children[i].second;
 			std::cout  << (char)('A' + (d % col)) << (row - d / row) << " " << c->total << " " << (c->score) / (c->total) * 100 << "%" << std::endl;
+			seo[d] = (c->score) / (c->total);
 		}
+		double network_train_out[225];
+		double network_train_in[675];
+		for (int i = 0; i < 225; i++) {
+			if (seo.count(i)) network_train_out[i] = seo[i];
+			else network_train_out[i] = calc_out[i];
+		}
+		for (int i = 0; i < 225; i++) {
+			if (board.board.getGridColor(i) == Stone::BLACK) network_train_in[i] = 1;
+			else network_train_in[i] = 0;
+		}
+		for (int i = 0; i < 225; i++) {
+			if (board.board.getGridColor(i) == Stone::WHITE) network_train_in[225 + i] = 1;
+			else network_train_in[225 + i] = 0;
+		}
+		for (int i = 0; i < 225; i++) {
+			if (color == Stone::BLACK) network_train_in[225 * 2 + i] = 1;
+			else network_train_in[225 * 2 + i] = 1;
+		}
+		for (int i = 0; i < 675; i++) {
+			network_train << fixed << setprecision(5) << network_train_in[i] << " ";
+		}
+		network_train << endl;
+		for (int i = 0; i < 225; i++) {
+			network_train << fixed << setprecision(5) << network_train_out[i] << " ";
+		}
+		network_train << endl;
+		cout << count++<<endl;
 		root->deleteChildren();
 		delete root;
 		return choice;

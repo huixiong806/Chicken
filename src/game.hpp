@@ -22,11 +22,14 @@ enum class PutStoneResult :bool
 	NOTALLOWED,
 	ACCEPTED,
 };
+double calc_in[675];
+double *calc_out = nullptr;
 template<size_t row, size_t col>
 class Game
 {
-private:
+public:
 	Board<row, col> board;
+private:
 	int32_t winK, fastPlayRange;
 	bool blackPass, whitePass;
 	int32_t* distField;
@@ -194,9 +197,28 @@ public:
 	}
 	// {opposite, self}
 	/*int32_t*/
-	int32_t calcScore(Color color, int r, int c, const int32_t* estimateValue_)
+	void calcNetwork(Color color) {
+		static struct fann *ann=fann_create_from_file(".\\Chicken.net");
+		static int count = 0;
+		//cout << count<<endl;
+		count++;
+		for (int i = 0; i < 225; i++) {
+			if (board.getGridColor(i) == Stone::BLACK) calc_in[i] = 1;
+			else calc_in[i] = 0;
+		}
+		for (int i = 0; i < 225; i++) {
+			if (board.getGridColor(i) == Stone::WHITE) calc_in[225 + i] = 1;
+			else calc_in[225 + i] = 0;
+		}
+		for (int i = 0; i < 225; i++) {
+			if (color == Stone::BLACK) calc_in[225 * 2 + i] = 1;
+			else calc_in[225 * 2 + i] = 1;
+		}
+		calc_out = fann_run(ann, calc_in);
+	}
+	double calcScore(Color color, int r, int c, const int32_t* estimateValue_=0)
 	{
-		assert(winK <= row && winK <= col);
+		/*assert(winK <= row && winK <= col);
 		const int rd[4] = { 1,0,1,1 };
 		const int cd[4] = { 0,1,1,-1 };
 		//const int selfScores[6] = { 0,300,500,3000,10000,0 } ;
@@ -211,7 +233,7 @@ public:
 			  state为一个"5连"的状态压缩形式
 			  空位的位置*81+第1个非空位置的棋子颜色*27+...+第4个非空位置的棋子颜色
 			  0表示白棋，1表示空，2表示黑棋
-			*/
+			
 			size_t state = 0;
 			int cnt = 0, cnto = 0;
 			//printf("> k = %d\n", k);
@@ -243,9 +265,11 @@ public:
 				rr += rd[k], cc += cd[k];
 			} while (inside(rr, cc) && (rr != r1 || cc != c1));
 		}
-		return res;
+		return res;*/
+
+		return calc_out[r*col + c];
 	}
-	int fastDecision(Color color,const int32_t* estimateValue_)
+	int fastDecision(Color color,const int32_t* estimateValue_=0)
 	{
 		// Critical points test
 		/*
@@ -262,11 +286,12 @@ public:
 		*/
 		// Select by score
 		int index = row * col + 1;
-		int32_t maxScore = -1;
+		double maxScore = -1;
+		calcNetwork(color);
 		std::vector<int32_t> indices = getNearPositions(fastPlayRange);//, pool;
 		for (auto i : indices)
 		{
-			int32_t score = calcScore(color, i / col, i % col, estimateValue_);
+			double score = calcScore(color, i / col, i % col, estimateValue_);
 			//if (score.first < score.second) std::swap(score.first, score.second);
 			if (score > maxScore)
 			{
