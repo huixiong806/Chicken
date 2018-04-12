@@ -50,7 +50,7 @@ int main()
 		cout << "Input MCTS playout(>1000):" << endl;
 		cin >> playout;
 	}else{
-		playout=train_playout;
+		playout=16;
 	}
 	/*
 	streambuf * backup;

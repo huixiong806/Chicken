@@ -68,8 +68,8 @@ public:
 	}
 	~Game()
 	{
-		delete[] distField;
-		delete[] estimateValue;
+		//delete[] distField;
+		//delete[] estimateValue;
 	}
 	bool isEmpty(size_t index)
 	{
@@ -199,9 +199,6 @@ public:
 	/*int32_t*/
 	void calcNetwork(Color color) {
 		static struct fann *ann=fann_create_from_file(".\\Chicken.net");
-		static int count = 0;
-		//cout << count<<endl;
-		count++;
 		for (int i = 0; i < 225; i++) {
 			if (board.getGridColor(i) == Stone::BLACK) calc_in[i] = 1;
 			else calc_in[i] = 0;
@@ -214,6 +211,7 @@ public:
 			if (color == Stone::BLACK) calc_in[225 * 2 + i] = 1;
 			else calc_in[225 * 2 + i] = 1;
 		}
+		//cout << "Running" << endl;
 		calc_out = fann_run(ann, calc_in);
 	}
 	double calcScore(Color color, int r, int c, const int32_t* estimateValue_=0)
