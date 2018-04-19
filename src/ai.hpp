@@ -164,7 +164,7 @@ public:
 		}	
 		QueryPerformanceCounter(&endTime);
 		runTime = (((endTime.QuadPart - startTime.QuadPart)*1.0) / cpuFreq.QuadPart);
-		std::cout << "speed: " << ((double)runTime) / (double)playout << "n/s" << std::endl;
+		std::cout << "speed: " << ((double)playout / (double)runTime )<< "n/s" << std::endl;
 		int32_t maxTimes = -1;
 		size_t choice = 0;
 		double winRate=0;
@@ -190,7 +190,12 @@ public:
 		}
 		double network_train_out[225];
 		double network_train_in[675];
-		static struct fann *ann = fann_create_from_file(".\\Chicken.net");
+		static struct fann *ann;
+		if (new_game_2) {
+			fann_destroy(ann);
+			ann = fann_create_from_file(".\\Chicken.net");
+			new_game_2 = false;
+		}
 		double calc_in[1000];
 		for (int i = 0; i < 225; i++) {
 			if (board.board.getGridColor(i) == Stone::BLACK) calc_in[i] = 1;
@@ -209,20 +214,8 @@ public:
 			if (seo.count(i)) network_train_out[i] = seo[i];
 			else network_train_out[i] = calc_out[i];
 		}
-		for (int i = 0; i < 225; i++) {
-			if (board.board.getGridColor(i) == Stone::BLACK) network_train_in[i] = 1;
-			else network_train_in[i] = 0;
-		}
-		for (int i = 0; i < 225; i++) {
-			if (board.board.getGridColor(i) == Stone::WHITE) network_train_in[225 + i] = 1;
-			else network_train_in[225 + i] = 0;
-		}
-		for (int i = 0; i < 225; i++) {
-			if (color == Stone::BLACK) network_train_in[225 * 2 + i] = 1;
-			else network_train_in[225 * 2 + i] = 1;
-		}
 		for (int i = 0; i < 675; i++) {
-			network_train << fixed << setprecision(5) << network_train_in[i] << " ";
+			network_train << fixed << setprecision(0) << calc_in[i] << " ";
 		}
 		network_train << endl;
 		for (int i = 0; i < 225; i++) {

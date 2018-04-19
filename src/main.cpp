@@ -13,6 +13,8 @@ Publish under GNU General Public License v3.0 Licence.
 #include <cstdlib>
 #include "const.h"
 #include <string>
+bool new_game_1 = true;
+bool new_game_2 = true;
 std::ofstream network_train(".\\train.tmp");
 #ifdef _DEBUG
 #pragma comment(lib,"..\\lib\\fanndoubled.lib")
@@ -25,7 +27,7 @@ const int siz =15;
 int main()
 {
 	/*struct fann *ann;
-	ann=fann_create_standard(num_layers, 675, 64, 64, 64, 64, 64, 225);
+	ann=fann_create_standard(num_layers, 675 ,64,64,64,64,64,225);
 	fann_randomize_weights(ann, -1, 1);
 	fann_save(ann, ".\\chicken.net");
 	*/
@@ -61,6 +63,8 @@ int main()
 	cout.rdbuf(fout.rdbuf());
 	*/
 	do{
+		new_game_1 = true;
+		new_game_2 = true;
 		count_move = 0;
 		srand(time(0));
 		Game<siz, siz> game;
@@ -70,6 +74,7 @@ int main()
 		int32_t winner = 0;
 		while (!game.gameOver())
 		{
+			count_move = 0;
 			cout << (color > 0 ? "Black's turn" : "White's turn") << endl;
 			size_t index;
 			if (color == myColor)

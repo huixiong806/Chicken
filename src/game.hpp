@@ -13,6 +13,7 @@ Publish under GNU General Public License v3.0 Licence.
 #include <algorithm>
 #include <cassert>
 #include "hash.hpp"
+extern bool new_game_1;
 const double value[2][4] =
 { {0.3,0.5,3.0,10.0},
   {0.2,0.4,2.0,20.0}
@@ -32,8 +33,7 @@ public:
 private:
 	int32_t winK, fastPlayRange;
 	bool blackPass, whitePass;
-	int32_t* distField;
-	int32_t* estimateValue;
+	int32_t distField[225];
 protected:
 public:
 	int32_t getWink()
@@ -46,25 +46,10 @@ public:
 		fastPlayRange = 2;
 		blackPass = false;
 		whitePass = false;
-		distField = new int32_t[row*col];
-		estimateValue = new int32_t[405];
-	}
-	Game(int32_t* estimateValue_)
-	{
-		winK = 5;
-		fastPlayRange = 2;
-		blackPass = false;
-		whitePass = false;
-		distField = new int32_t[row*col];
-		estimateValue = new int32_t[405];
-		copy(estimateValue_, estimateValue_ + 405, estimateValue);
 	}
 	Game(const Game& r) :board(r.board), winK(r.winK), fastPlayRange(r.fastPlayRange), blackPass(r.blackPass), whitePass(r.whitePass)
 	{
-		distField = new int32_t[row*col];
-		estimateValue = new int32_t[405];
 		copy(r.distField, r.distField + row * col, distField);
-		copy(r.estimateValue, r.estimateValue + row * col, estimateValue);
 	}
 	~Game()
 	{
@@ -198,7 +183,13 @@ public:
 	// {opposite, self}
 	/*int32_t*/
 	void calcNetwork(Color color) {
-		static struct fann *ann=fann_create_from_file(".\\Chicken.net");
+
+		static struct fann *ann;
+		if (new_game_1) {
+			fann_destroy(ann);
+			ann = fann_create_from_file(".\\Chicken.net");
+			new_game_1 = false;
+		}
 		for (int i = 0; i < 225; i++) {
 			if (board.getGridColor(i) == Stone::BLACK) calc_in[i] = 1;
 			else calc_in[i] = 0;
@@ -214,7 +205,7 @@ public:
 		//cout << "Running" << endl;
 		calc_out = fann_run(ann, calc_in);
 	}
-	double calcScore(Color color, int r, int c, const int32_t* estimateValue_=0)
+	double calcScore(Color color, int r, int c)
 	{
 		/*assert(winK <= row && winK <= col);
 		const int rd[4] = { 1,0,1,1 };
@@ -267,7 +258,7 @@ public:
 
 		return calc_out[r*col + c];
 	}
-	int fastDecision(Color color,const int32_t* estimateValue_=0)
+	int fastDecision(Color color)
 	{
 		// Critical points test
 		/*
@@ -289,7 +280,7 @@ public:
 		std::vector<int32_t> indices = getNearPositions(fastPlayRange);//, pool;
 		for (auto i : indices)
 		{
-			double score = calcScore(color, i / col, i % col, estimateValue_);
+			double score = calcScore(color, i / col, i % col);
 			//if (score.first < score.second) std::swap(score.first, score.second);
 			if (score > maxScore)
 			{
@@ -314,11 +305,7 @@ public:
 	}
 	void fastPlay(Color color)
 	{
-		play(fastDecision(color, estimateValue), color);
-	}
-	void fastPlay(Color color,const int32_t* estimateValue_)
-	{
-		play(fastDecision(color, estimateValue_), color);
+		play(fastDecision(color), color);
 	}
 	bool gameOver()
 	{
